@@ -13,7 +13,7 @@
 #include <vector>
 #include <sstream>
 #include <stdlib.h>
-
+#include <signal.h>
 #define MAXLEN 10500
 using namespace std;
 

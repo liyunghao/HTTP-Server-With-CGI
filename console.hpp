@@ -55,6 +55,29 @@ vector<host> parse(string input) {
 	return out;
 }
 
+string escape(string s) {
+	string res;
+	for (auto x : s) {
+		switch (x) {
+			case '\n':
+				res += "&NewLine;";
+				break;
+			case '&':
+				res += "&amp;";
+				break;
+			case '>':
+				res += "&gt;";
+				break;
+			case '<':
+				res += "&lt;";
+				break;
+			default:
+				res += x; 
+		}
+	}
+	return res;
+}
+
 void scope(vector<host> hosts) {
 	cout << "<!DOCTYPE html> \
 				<html lang=\"en\"> \
@@ -104,15 +127,17 @@ void scope(vector<host> hosts) {
 		cout << "</tr> \
 					  </thead> \
 					  <tbody> \
-						<tr>\
-						  <td><pre id=\"s0\" class=\"mb-0\"></pre></td>\
-						  <td><pre id=\"s1\" class=\"mb-0\"></pre></td>\
-						</tr> \
+						<tr>";
+		for (int i = 0; i < 5; i++) {
+			if (hosts[i].hname.empty())
+				break;
+			cout << "<td><pre id=\"s" << i << "\" class=\"mb-0\"></pre></td>";
+		}
+		cout << "</tr> \
 					  </tbody> \
 					</table> \
 				  </body> \
-				</html> \
-" ;
+				</html> " ;
 
 }
 

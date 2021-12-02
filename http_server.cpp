@@ -26,13 +26,14 @@ private:
 	void do_work() {
 		string input(data_);
 		res = parse(input); 
-		res.print();
+		//res.print();
 		
 		//exec cgi
 		do_exec(res.target);
 	}
 	void do_exec(string cmd) {
 		int pid;
+		signal(SIGCHLD, SIG_IGN);
 		if ( (pid = fork()) < 0) {
 			perror("fork error\n");
 		}
@@ -88,9 +89,9 @@ private:
 		acceptor_.async_accept(
 			[this](boost::system::error_code ec, tcp::socket socket) {
 				if (!ec) {
-					std::cout << socket.remote_endpoint().address().to_string() << '\n';
-					std::cout << socket.remote_endpoint().port() << '\n';
-					std::cout << "accept\n";
+					//std::cout << socket.remote_endpoint().address().to_string() << '\n';
+					//std::cout << socket.remote_endpoint().port() << '\n';
+					//std::cout << "accept\n";
 					std::make_shared<session>(std::move(socket))->start();
 				}
 				do_accept();	
