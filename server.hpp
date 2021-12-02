@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef SERVER
+#define SERVER
 #include <boost/asio.hpp>
 #include <iostream>
 #include <unistd.h>
@@ -66,3 +66,4 @@ parseRes parse(string input) {
 	return r;
 }
 
+#endif

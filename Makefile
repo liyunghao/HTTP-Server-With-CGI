@@ -4,11 +4,14 @@ CXX_INCLUDE_DIRS=/usr/local/include
 CXX_INCLUDE_PARAMS=$(addprefix -I , $(CXX_INCLUDE_DIRS))
 CXX_LIB_DIRS=/usr/local/lib
 CXX_LIB_PARAMS=$(addprefix -L , $(CXX_LIB_DIRS))
-TARGET=./http_server
+TARGET = ./http_server console.cgi
 .PHONY: all clean
-all: $(TARGET) server.hpp
+all: $(TARGET)
 
-$(TARGET):  % : %.cpp
+./http_server:  % : %.cpp server.hpp
+	$(CXX) $< -o $@ $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS) $(CXXFLAGS)
+
+console.cgi: %.cgi : %.cpp console.hpp
 	$(CXX) $< -o $@ $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS) $(CXXFLAGS)
 
 clean:

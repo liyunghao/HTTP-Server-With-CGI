@@ -16,10 +16,9 @@ private:
 	void do_read() {
 		auto self(shared_from_this());
 		socket_.async_read_some(boost::asio::buffer(data_, MAXLEN),
-			[this, self](boost::system::error_code ec, std::size_t length)
+			[this, self](const boost::system::error_code ec, std::size_t length)
 			{
 				if (!ec) {
-					//std::cout << socket_.native_handle() << '\n';
 					do_work();
 				}
 			});
@@ -33,7 +32,6 @@ private:
 		do_exec(res.target);
 	}
 	void do_exec(string cmd) {
-		//cerr << cmd << '\n';
 		int pid;
 		if ( (pid = fork()) < 0) {
 			perror("fork error\n");
@@ -44,14 +42,12 @@ private:
 			dup2(socket_.native_handle(), 1);
 			char *arg[10];
 			string tmp = "." + cmd;
-			//cerr << tmp << '\n';
 			char *c = strdup(tmp.c_str());
 			arg[0] = c;
 			arg[1] = NULL;
-			
+			socket_.close();
 			cout << "HTTP/1.1 200 OK\r\n";
 			fflush(stdout);
-			//cerr << arg[0] << '\n';
 			if (execvp(arg[0], arg) < 0) {
 				perror("Exec error");
 				exit(-1);
@@ -67,8 +63,8 @@ private:
 		setenv("QUERY_STRING", res.query.c_str(), 1);
 		setenv("SERVER_PROTOCOL", res.proto.c_str(), 1);
 		setenv("HTTP_HOST", res.host.c_str(), 1);
-		//setenv("SERVER_ADDR", _addr, 1);
-		//setenv("SERVER_PORT", _port, 1);
+		setenv("SERVER_ADDR", socket_.local_endpoint().address().to_string().c_str(), 1);
+		setenv("SERVER_PORT", to_string(socket_.local_endpoint().port()).c_str(), 1);
 		setenv("REMOTE_ADDR", socket_.remote_endpoint().address().to_string().c_str(), 1);
 		setenv("REMOTE_PORT", to_string(socket_.remote_endpoint().port()).c_str(), 1);
 	}	
@@ -77,7 +73,6 @@ private:
 	char data_[MAXLEN];
 	struct parseRes res;
 	
-	//std::string data_;
 };
 
 class server {
