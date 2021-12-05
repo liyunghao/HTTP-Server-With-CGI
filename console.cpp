@@ -9,14 +9,12 @@ public:
 	
 	void start() {
 		// create template
-		//scope();
 		ReadFile();
 		ReadPrompt();
 	}
 private:
 	void ReadPrompt () {
 		auto self(shared_from_this());
-		//cerr << "Read\n";
 		memset(buf, 0, sizeof(buf));
 		socket_->async_read_some(boost::asio::buffer(buf, MAXLEN), 
 				[this, self] (const boost::system::error_code &ec, size_t length)
@@ -45,7 +43,7 @@ private:
 		    cmd.erase(pos);
 		}
 		cmd += "\n";
-		cerr << cmd ;
+		//cerr << cmd ;
 		return cmd;
 		 
 	}
@@ -53,12 +51,10 @@ private:
 	void Write() {
 		auto self(shared_from_this());
 		string cmd = ReadLine();
-		//cerr << "Write" << '\n';
 		socket_->async_write_some(boost::asio::buffer(cmd.c_str(), cmd.size()),
 				[this, self, cmd](const boost::system::error_code &ec, size_t length) {
 					PrintCmd(cmd);
 					if ( strncmp(cmd.c_str(), "exit", 4) != 0) {
-						//cerr << "Is not exit\n";
 						ReadPrompt();
 					} else {
 						exit();
@@ -69,15 +65,12 @@ private:
 		socket_->close();
 	}
 	void PrintCmd(string s) {
-		//cerr << s ;
     	string script =  "<script>document.getElementById(\"s" + to_string(id) + "\").innerHTML += \"<b>" + escape(s) + "</b>\" ;</script>";
 		cout << script;
 	}
 	
 	void PrintRes(string s) {
-		//cerr << s;
     	string script =  "<script>document.getElementById(\"s" + to_string(id) + "\").innerHTML += \"" + escape(s) + "\" ;</script>";
-    	//print(f"<script>document.getElementById('{session}').innerHTML += '{content}';</script>")
 		cout << script;
 	}
 	
@@ -90,11 +83,7 @@ private:
 };
 int main () {
 	string query = string(getenv("QUERY_STRING"));
-	//string query = "h0=nplinux2.cs.nctu.edu.tw&p0=1213&f0=t1.txt&h1=nplinux2.cs.nctu.edu.tw&p1=5678&f1=t2.txt&h2=&p2=&f2=&h3=&p3=&f3=&h4=&p4=&f4=";
 	vector<host> hosts = parse(query);
-	//for (auto x : hosts) {
-		//x.print();
-	//}
 	boost::asio::io_context _context;
 	tcp::resolver resolver_(_context);
 
@@ -102,10 +91,8 @@ int main () {
 	scope(hosts);
 
 	for (int i = 0; i < 5; i++) {
-		//cerr << i << '\n';
 		if (hosts[i].hname.empty())
 			break;
-		//cerr << "inside " << i << '\n';
 		shared_ptr<tcp::socket> sock = make_shared<tcp::socket>(_context);
 		resolver_.async_resolve(hosts[i].hname, to_string(hosts[i].port),
 				[hosts, i, sock](const boost::system::error_code& ec, tcp::resolver::results_type results) 
@@ -113,7 +100,6 @@ int main () {
 					if (!ec) {
 						
 						for (auto it = results.begin(); it != results.end(); it++) {
-						//	cerr << it->endpoint().address().to_string() << '\n';
 							sock->async_connect(it->endpoint(), 
 									[sock, hosts, i](const boost::system::error_code &err)
 									{
