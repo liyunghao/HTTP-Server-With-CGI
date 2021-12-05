@@ -40,19 +40,19 @@ private:
 	string ReadLine() {
 		string cmd;
 		getline(file, cmd);
-		for (auto &x : cmd) {
-			//cerr << int(x) << ' ';
-			//cerr << '\n';
-			if (x == '\r') 
-				x = 0;
+		int pos;
+	    if ( (pos = cmd.find("\r")) != -1) {
+		    cmd.erase(pos);
 		}
+		cmd += "\n";
+		cerr << cmd ;
 		return cmd;
+		 
 	}
 
 	void Write() {
 		auto self(shared_from_this());
 		string cmd = ReadLine();
-		cmd += "\n";
 		//cerr << "Write" << '\n';
 		socket_->async_write_some(boost::asio::buffer(cmd.c_str(), cmd.size()),
 				[this, self, cmd](const boost::system::error_code &ec, size_t length) {
@@ -60,10 +60,14 @@ private:
 					if ( strncmp(cmd.c_str(), "exit", 4) != 0) {
 						//cerr << "Is not exit\n";
 						ReadPrompt();
+					} else {
+						exit();
 					}
 				});
 	}
-	
+	void exit() {
+		socket_->close();
+	}
 	void PrintCmd(string s) {
 		//cerr << s ;
     	string script =  "<script>document.getElementById(\"s" + to_string(id) + "\").innerHTML += \"<b>" + escape(s) + "</b>\" ;</script>";
